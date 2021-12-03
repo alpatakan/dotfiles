@@ -1,0 +1,4 @@
+#!/bin/bash 
+
+LC_NUMERIC=en_US.UTF-8
+printf '%.0f\n' $(curl -s "https://api.bitfinex.com/v1/pubticker/${ticker}" | jq -j '.["last_price"]')
