@@ -1,4 +1,4 @@
 #!/bin/bash 
 
 LC_NUMERIC=en_US.UTF-8
-printf '%2.2f\n' $(curl -s "http://free.currencyconverterapi.com/api/v3/convert?q=${parity}&compact=ultra&apiKey=$(cat ~/dotfiles/currency_key)" | jq -j '.["'${parity}'"]')
+printf '%2.2f\n' $(curl -s "http://free.currencyconverterapi.com/api/v3/convert?q=${parity}&compact=ultra&apiKey=$(cat ~/my/currency_key)" | jq -j '.["'${parity}'"]')
