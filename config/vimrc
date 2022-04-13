@@ -1,0 +1,107 @@
+set background=dark
+
+syntax enable
+
+let mapleader = ","
+
+set nocompatible
+filetype off                  " required
+
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'flazz/vim-colorschemes'
+Plugin 'tpope/vim-fugitive'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'vim-syntastic/syntastic'
+Plugin 'morhetz/gruvbox'
+Plugin 'majutsushi/tagbar.git'
+Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plugin 'junegunn/fzf.vim'
+Plugin 'mhinz/vim-grepper'
+
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+" colorscheme
+autocmd vimenter * colorscheme gruvbox
+
+" hybrid line numbers
+:set number relativenumber
+
+:augroup numbertoggle
+:  autocmd!
+:  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+:  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+:augroup END
+" hybrid line numbers
+
+set ignorecase smartcase
+set t_Co=256
+set hlsearch
+set history =1001
+
+autocmd VimLeave * call system("xsel -ib", getreg('+'))
+
+" select all
+nnoremap <c-a> ggVG
+
+" clipboard stuff
+vnoremap <leader>y "+y
+inoremap <leader>p <ESC>"+p<i>
+vnoremap <leader>p <i>"+p<ESC>
+"vnoremap <Leader>y "*y
+"nnoremap <Leader>p "*p
+
+"buffers remember their states
+set hidden
+
+" switch between last buffer with space
+nnoremap <space> <C-^>
+
+" fzf 
+nnoremap <C-p> :FZF<Cr>
+nnoremap <leader>f :BLines<cr>
+nnoremap <leader>F :Lines<cr>
+nnoremap <leader>b :Buffers<cr>
+
+" start scrolling at 3rd row
+set scrolloff=3
+
+" show matching brackets as they're inserted
+set showmatch
+
+nnoremap <c-h> <c-w>h
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-l> <c-w>l
+
+imap <esc>OH <esc>0i
+cmap <esc>OH <home>
+nmap <esc>OH 0
+
+nmap <esc>OF $
+imap <esc>OF <esc>$a
+cmap <esc>OF <end>
+
+" syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_mode_map = {
+    \ "mode": "passive",
+    \ "active_filetypes": ["python"],
+    \ "passive_filetypes": [] }
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 1
+
+" youcompleteme
+let g:ycm_global_ycm_extra_conf = '~/rc_files/ycm_extra_conf.py'
+
+" grepper Rg shortcut
+command! -nargs=* -complete=file Rg GrepperRg <args>
+autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>
