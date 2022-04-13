@@ -1,0 +1,108 @@
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+alias ..="cd .."
+alias ..2="cd ../.."
+alias ..3="cd ../../.."
+alias ..4="cd ../../../.."
+alias ..5="cd ../../../../.."
+alias ..6="cd ../../../../../.."
+alias ..7="cd ../../../../../../.."
+
+alias cdroot='cd $(git root)'
+
+# awesome-terminal-fonts
+source ~/.fonts/*.sh
+
+# geometry theme configuration
+PROMPT_GEOMETRY_EXEC_TIME="true"
+GEOMETRY_PATH_COLOR="178"
+# also use this: git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+# add this to end of the zshrc source /home/alp/rc_files/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# font: https://github.com/powerline/fonts/tree/master/RobotoMono
+
+# zsh color spectrum show function
+ZSH_SPECTRUM_TEXT=${ZSH_SPECTRUM_TEXT:-Arma virumque cano Troiae qui primus ab oris}
+
+# Show all 256 colors with color number
+function spectrum_ls() {
+  for code in {000..255}; do
+    print -P -- "$code: %{$FG[$code]%}$ZSH_SPECTRUM_TEXT%{$reset_color%}"
+  done
+}
+
+# Show all 256 colors where the background is set to specific color
+function spectrum_bls() {
+  for code in {000..255}; do
+    print -P -- "$code: %{$BG[$code]%}$ZSH_SPECTRUM_TEXT%{$reset_color%}"
+  done
+}
+
+# oh-my-zsh settings
+DISABLE_AUTO_TITLE="true"
+
+function n() {
+	if [[ -z "$@" ]]; then
+		msg="DONE"
+	else
+		msg="$@"
+	fi
+	notify-send "$msg"
+}
+
+function lss() {
+	ls -laht "$@" | head -n 10
+}
+
+function f() {
+	find . -name "$1"
+}
+
+# Handy Extract Program
+function extract() {
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xvjf $1     ;;
+            *.tar.gz)    tar xvzf $1     ;;
+            *.bz2)       bunzip2 $1      ;;
+            *.rar)       unrar x $1      ;;
+            *.gz)        gunzip $1       ;;
+            *.tar)       tar xvf $1      ;;
+            *.tbz2)      tar xvjf $1     ;;
+            *.tgz)       tar xvzf $1     ;;
+            *.zip)       unzip $1        ;;
+            *.Z)         uncompress $1   ;;
+            *.7z)        7z x $1         ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
+}
+
+
+function pyclean () {
+    find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+}
+
+# Zsh history
+export HISTFILE=~/.zsh_history
+export HISTSIZE=1000000000
+export SAVEHIST=$HISTSIZE
+
+export EDITOR=vim
+
+alias tmux="TERM=screen-256color-bce tmux"
+export MANPAGER="less -isg"
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+
+# Colored man pages: http://linuxtidbits.wordpress.com/2009/03/23/less-colors-for-man-pages/
+export LESS_TERMCAP_mb=$'\E[01;31m'			# begin blinking
+export LESS_TERMCAP_md=$'\E[01;38;5;74m'		# begin bold
+export LESS_TERMCAP_me=$'\E[0m'				# end mode
+export LESS_TERMCAP_se=$'\E[0m'				# end standout-mode
+export LESS_TERMCAP_so=$'\E[38;5;016m\E[48;5;220m'	# begin standout-mode - info box
+export LESS_TERMCAP_ue=$'\E[0m'           	        # end underline
+
