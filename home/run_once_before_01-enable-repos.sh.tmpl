@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ if eq .chezmoi.osRelease.id "fedora" -}}
+echo "==> Enabling additional DNF repositories"
+
+FEDORA_VER=$(rpm -E %fedora)
+
+# RPM Fusion (free + nonfree) — required for things like codecs and h264 support
+if ! rpm -q rpmfusion-free-release >/dev/null 2>&1; then
+    sudo dnf install -y \
+        "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_VER}.noarch.rpm" \
+        "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_VER}.noarch.rpm"
+fi
+
+# Flathub — F43 ships filtered by default; unfilter so the full catalog is available
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak remote-modify --no-filter --enable flathub 2>/dev/null || \
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+fi
+
+# Ghostty COPR (scottames/ghostty — maintained Fedora build)
+if ! sudo dnf copr list 2>/dev/null | grep -q "scottames/ghostty"; then
+    sudo dnf copr enable -y scottames/ghostty
+fi
+
+{{ if .install_docker -}}
+# Docker CE (official, not fedora's podman-docker shim)
+if [ ! -f /etc/yum.repos.d/docker-ce.repo ]; then
+    sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+fi
+{{- end }}
+
+echo "==> Repos ready"
+{{ end -}}

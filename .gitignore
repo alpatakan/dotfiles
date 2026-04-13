@@ -1,1 +1,4 @@
-currency_key
+*.swp
+*.bak
+.DS_Store
+

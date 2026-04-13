@@ -1,0 +1,86 @@
+set background=dark
+syntax enable
+
+let mapleader = ","
+
+set nocompatible
+
+" -------- vim-plug bootstrap --------
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+Plug 'tpope/vim-fugitive'
+Plug 'morhetz/gruvbox'
+Plug 'preservim/tagbar'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'dense-analysis/ale'
+Plug 'pangloss/vim-javascript'
+call plug#end()
+
+filetype plugin indent on
+
+" colorscheme (silent so a fresh install before :PlugInstall doesn't error)
+silent! colorscheme gruvbox
+
+" hybrid line numbers
+set number relativenumber
+augroup numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+augroup END
+
+set ignorecase smartcase
+set hlsearch
+set history=1001
+set scrolloff=3
+set showmatch
+set hidden
+
+" Wayland/X11 system clipboard
+set clipboard=unnamedplus
+
+" select all
+nnoremap <c-a> ggVG
+
+" clipboard yank/paste
+vnoremap <leader>y "+y
+vnoremap <leader>p "+p
+inoremap <leader>p <ESC>"+pa
+
+" switch between last buffer with space
+nnoremap <space> <C-^>
+
+" fzf
+nnoremap <C-p> :FZF<Cr>
+nnoremap <leader>f :BLines<cr>
+nnoremap <leader>F :Lines<cr>
+nnoremap <leader>b :Buffers<cr>
+
+" window navigation
+nnoremap <c-h> <c-w>h
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-l> <c-w>l
+
+" Home/End in xterm-keys mode
+imap <esc>OH <esc>0i
+cmap <esc>OH <home>
+nmap <esc>OH 0
+nmap <esc>OF $
+imap <esc>OF <esc>$a
+cmap <esc>OF <end>
+
+" ALE (replaces syntastic)
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_save = 1
+
+" close quickfix on <CR>
+autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>

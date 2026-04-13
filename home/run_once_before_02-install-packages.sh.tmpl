@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ if eq .chezmoi.osRelease.id "fedora" -}}
+echo "==> Installing base package groups"
+sudo dnf group install -y development-tools c-development
+
+echo "==> Installing CLI tools"
+sudo dnf install -y \
+    git vim neovim tmux fzf ripgrep btop htop zsh \
+    curl wget jq fd-find bat zoxide gh \
+    wl-clipboard xclip xsel \
+    unzip p7zip p7zip-plugins \
+    diff-so-fancy \
+    ShellCheck tree
+
+echo "==> Installing Ghostty terminal"
+sudo dnf install -y ghostty
+
+echo "==> Installing GNOME Remote Desktop + SELinux port tools"
+sudo dnf install -y gnome-remote-desktop policycoreutils-python-utils openssl
+
+{{ if .install_docker -}}
+echo "==> Installing Docker CE"
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
+if ! id -nG "$USER" | grep -qw docker; then
+    sudo usermod -aG docker "$USER"
+    echo "    NOTE: log out and back in for docker group membership to take effect"
+fi
+{{- end }}
+
+echo "==> Package install complete"
+{{ end -}}

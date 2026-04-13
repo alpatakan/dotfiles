@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PLUG="$HOME/.vim/autoload/plug.vim"
+
+if [ ! -f "$PLUG" ]; then
+    echo "==> Installing vim-plug"
+    curl -fLo "$PLUG" --create-dirs \
+        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+if command -v vim >/dev/null 2>&1; then
+    echo "==> Running :PlugInstall headless"
+    vim +'PlugInstall --sync' +qa || true
+fi

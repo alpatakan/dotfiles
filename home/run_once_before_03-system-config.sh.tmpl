@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+{{ if eq .chezmoi.osRelease.id "fedora" -}}
+
+SSH_PORT=2211
+
+echo "==> Configuring sshd on port ${SSH_PORT}"
+sudo tee /etc/ssh/sshd_config.d/50-local.conf >/dev/null <<EOF
+# Managed by chezmoi (run_once_before_03-system-config.sh.tmpl)
+Port ${SSH_PORT}
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+ChallengeResponseAuthentication no
+EOF
+
+echo "==> Adding SELinux ssh_port_t label for ${SSH_PORT}"
+if ! sudo semanage port -l | grep -E "^ssh_port_t" | grep -qw "${SSH_PORT}"; then
+    sudo semanage port -a -t ssh_port_t -p tcp "${SSH_PORT}"
+fi
+
+echo "==> Opening ${SSH_PORT}/tcp in firewalld"
+sudo firewall-cmd --permanent --add-port="${SSH_PORT}/tcp"
+sudo firewall-cmd --reload
+
+echo "==> Enabling sshd"
+sudo systemctl enable --now sshd
+sudo systemctl restart sshd
+
+echo "==> Disabling GNOME auto-suspend for current user"
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing' 2>/dev/null || true
+gsettings set org.gnome.desktop.session idle-delay 0
+gsettings set org.gnome.desktop.screensaver lock-enabled false
+gsettings set org.gnome.desktop.screensaver idle-activation-enabled false
+
+echo "==> Disabling suspend on GDM lock screen (system-wide)"
+sudo mkdir -p /etc/dconf/db/gdm.d
+sudo tee /etc/dconf/db/gdm.d/10-power >/dev/null <<'EOF'
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-ac-type='nothing'
+sleep-inactive-ac-timeout=uint32 0
+sleep-inactive-battery-type='nothing'
+idle-dim=false
+
+[org/gnome/desktop/session]
+idle-delay=uint32 0
+EOF
+sudo dconf update
+
+echo "==> Enabling GDM auto-login for user '$USER'"
+sudo install -m 0644 -D /dev/null /etc/gdm/custom.conf.new
+sudo tee /etc/gdm/custom.conf >/dev/null <<EOF
+# Managed by chezmoi (run_once_before_03-system-config.sh.tmpl)
+[daemon]
+AutomaticLoginEnable=True
+AutomaticLogin=${USER}
+WaylandEnable=true
+
+[security]
+
+[xdmcp]
+
+[chooser]
+
+[debug]
+EOF
+
+echo "==> System config complete. A reboot is required for auto-login + GDM dconf changes."
+{{ end -}}

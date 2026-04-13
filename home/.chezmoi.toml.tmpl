@@ -1,0 +1,10 @@
+{{- $machineType := promptStringOnce . "machine_type" "Machine type (work / personal)" "work" -}}
+{{- $installDocker := promptBoolOnce . "install_docker" "Install docker-ce (in addition to podman)" true -}}
+{{- $gitEmail := promptStringOnce . "git_email" "Git email (used for the personal identity)" "atakanisbakan@gmail.com" -}}
+{{- $gitName := promptStringOnce . "git_name" "Git name" "alpatakan" -}}
+
+[data]
+    machine_type = {{ $machineType | quote }}
+    install_docker = {{ $installDocker }}
+    git_email = {{ $gitEmail | quote }}
+    git_name = {{ $gitName | quote }}

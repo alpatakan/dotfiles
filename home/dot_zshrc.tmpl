@@ -1,0 +1,132 @@
+##############################################################################
+# Managed by chezmoi. Edit ~/.local/share/chezmoi/home/dot_zshrc.tmpl
+##############################################################################
+
+# oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+DISABLE_AUTO_TITLE="true"
+plugins=(
+    git
+    fzf
+    docker
+    kubectl
+    zsh-autosuggestions
+    zsh-syntax-highlighting
+)
+[ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
+
+# ---------- aliases ----------
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+alias ..="cd .."
+alias ..2="cd ../.."
+alias ..3="cd ../../.."
+alias ..4="cd ../../../.."
+alias ..5="cd ../../../../.."
+alias ..6="cd ../../../../../.."
+alias ..7="cd ../../../../../../.."
+
+alias cdroot='cd $(git root 2>/dev/null || echo .)'
+
+# ---------- functions ----------
+function n() {
+    if [[ -z "$@" ]]; then
+        msg="DONE"
+    else
+        msg="$@"
+    fi
+    notify-send "$msg"
+}
+
+function lss() {
+    ls -laht "$@" | head -n 10
+}
+
+function f() {
+    find . -name "$1"
+}
+
+function extract() {
+    if [ -f "$1" ] ; then
+        case "$1" in
+            *.tar.bz2)   tar xvjf "$1"   ;;
+            *.tar.gz)    tar xvzf "$1"   ;;
+            *.tar.xz)    tar xvJf "$1"   ;;
+            *.bz2)       bunzip2 "$1"    ;;
+            *.rar)       unrar x "$1"    ;;
+            *.gz)        gunzip "$1"     ;;
+            *.tar)       tar xvf "$1"    ;;
+            *.tbz2)      tar xvjf "$1"   ;;
+            *.tgz)       tar xvzf "$1"   ;;
+            *.zip)       unzip "$1"      ;;
+            *.Z)         uncompress "$1" ;;
+            *.7z)        7z x "$1"       ;;
+            *)           echo "'$1' cannot be extracted via >extract<" ;;
+        esac
+    else
+        echo "'$1' is not a valid file!"
+    fi
+}
+
+function pyclean() {
+    find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+}
+
+# spectrum_ls / spectrum_bls: show 256 colors
+function spectrum_ls() {
+    for code in {000..255}; do
+        print -P -- "$code: %F{$code}Arma virumque cano Troiae qui primus ab oris%f"
+    done
+}
+function spectrum_bls() {
+    for code in {000..255}; do
+        print -P -- "$code: %K{$code}Arma virumque cano Troiae qui primus ab oris%k"
+    done
+}
+
+# ---------- history ----------
+export HISTFILE=~/.zsh_history
+export HISTSIZE=1000000000
+export SAVEHIST=$HISTSIZE
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+
+# ---------- environment ----------
+export EDITOR=vim
+export VISUAL=vim
+export MANPAGER="less -isg"
+export FZF_DEFAULT_COMMAND='rg --files --no-ignore-vcs --hidden'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# ---------- fzf ----------
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f /usr/share/fzf/shell/key-bindings.zsh ]; then
+    source /usr/share/fzf/shell/key-bindings.zsh
+fi
+
+# ---------- fnm (Node version manager) ----------
+export PATH="$HOME/.local/share/fnm:$PATH"
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --use-on-cd)"
+fi
+
+# ---------- zoxide (smarter cd) ----------
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+
+# ---------- colored man pages ----------
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;38;5;74m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[38;5;016m\E[48;5;220m'
+export LESS_TERMCAP_ue=$'\E[0m'
+
+# ---------- local overrides (untracked) ----------
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local

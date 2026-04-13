@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+KEY="$HOME/.ssh/id_ed25519"
+PUB="$KEY.pub"
+
+if [ ! -f "$KEY" ]; then
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    echo "==> Generating ed25519 SSH key"
+    ssh-keygen -t ed25519 -a 100 -C "alp@$(hostname)" -f "$KEY" -N ""
+fi
+
+if [ -f "$PUB" ]; then
+    echo ""
+    echo "==================== SSH PUBLIC KEY ===================="
+    cat "$PUB"
+    echo "========================================================"
+    echo ""
+    echo "Add it to GitHub:"
+    echo "    gh ssh-key add $PUB --title \"\$(hostname)\""
+    echo "or  https://github.com/settings/ssh/new"
+    echo ""
+fi

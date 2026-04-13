@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "==> Installing fnm (Node version manager)"
+if ! command -v fnm >/dev/null 2>&1; then
+    curl -fsSL https://fnm.vercel.app/install | bash -s -- --skip-shell
+fi
+
+FNM_DIR="$HOME/.local/share/fnm"
+export PATH="$FNM_DIR:$PATH"
+
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env)"
+    echo "==> Installing Node LTS"
+    fnm install --lts
+    fnm default lts-latest
+    node -v
+    npm -v
+fi
