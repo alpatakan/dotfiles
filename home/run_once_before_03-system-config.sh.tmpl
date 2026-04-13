@@ -3,25 +3,22 @@ set -euo pipefail
 
 {{ if eq .chezmoi.osRelease.id "fedora" -}}
 
-SSH_PORT=2211
-
-echo "==> Configuring sshd on port ${SSH_PORT}"
-sudo tee /etc/ssh/sshd_config.d/50-local.conf >/dev/null <<EOF
+echo "==> Configuring sshd (default port 22, password + key auth allowed, no root)"
+sudo tee /etc/ssh/sshd_config.d/50-local.conf >/dev/null <<'EOF'
 # Managed by chezmoi (run_once_before_03-system-config.sh.tmpl)
-Port ${SSH_PORT}
-PasswordAuthentication no
+# No explicit Port line — sshd listens on the default 22.
+# Password auth is enabled to allow bootstrapping access before pubkeys
+# are uploaded to ~/.ssh/authorized_keys. After you've added your trusted
+# client pubkey(s), consider flipping PasswordAuthentication to "no" for
+# stronger security.
+PasswordAuthentication yes
 PubkeyAuthentication yes
 PermitRootLogin no
 ChallengeResponseAuthentication no
 EOF
 
-echo "==> Adding SELinux ssh_port_t label for ${SSH_PORT}"
-if ! sudo semanage port -l | grep -E "^ssh_port_t" | grep -qw "${SSH_PORT}"; then
-    sudo semanage port -a -t ssh_port_t -p tcp "${SSH_PORT}"
-fi
-
-echo "==> Opening ${SSH_PORT}/tcp in firewalld"
-sudo firewall-cmd --permanent --add-port="${SSH_PORT}/tcp"
+echo "==> Ensuring firewalld allows the ssh service (port 22)"
+sudo firewall-cmd --permanent --add-service=ssh
 sudo firewall-cmd --reload
 
 echo "==> Enabling sshd"

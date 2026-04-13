@@ -75,21 +75,33 @@ ss -tlnp | grep 3389
 
 ## 5. Remote-desktop over the internet — SSH tunnel, do **not** forward 3389
 
-RDP-over-WAN is a bad target. Tunnel it over SSH on the already-hardened port 2211:
+RDP-over-WAN is a bad target. Tunnel it over SSH (default port 22):
 
-**On the router:** forward **only** TCP `2211` → work PC.
+**On the router:** forward **only** TCP `22` → work PC. (Consider an external port like `2222` on the router that maps to `22` internally — gives you non-default exposure without touching sshd config.)
+
+**⚠️ Before exposing sshd to the internet:** the chezmoi-managed drop-in ships with `PasswordAuthentication yes` so you can bootstrap access. Before forwarding from a router, **flip password auth off** and rely on keys only:
+
+```bash
+sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/' \
+    /etc/ssh/sshd_config.d/50-local.conf
+sudo systemctl restart sshd
+```
+
+Make sure your client pubkey is in `~/.ssh/authorized_keys` first — otherwise you'll lock yourself out.
 
 **From home:**
 
 ```bash
 # start the tunnel
-ssh -p 2211 -L 3389:localhost:3389 -N alp@<work-public-ip>
+ssh -L 3389:localhost:3389 -N alp@<work-public-ip>
 
 # in a separate terminal / RDP client, connect to:
 # localhost:3389
 ```
 
-Any RDP client (Remmina, mstsc, FreeRDP) works against `localhost:3389`. The SSH connection provides both the tunnel and the authentication (key-only).
+Any RDP client (Remmina, mstsc, FreeRDP) works against `localhost:3389`. The SSH connection provides both the tunnel and the authentication.
+
+**Security note:** port 22 vs a custom port is *obscurity*, not real security. What actually protects sshd is `PasswordAuthentication no` + `PubkeyAuthentication yes` + `PermitRootLogin no`. Non-default ports only reduce scanner log noise. Keep password auth enabled *only* while bootstrapping on a trusted LAN.
 
 ## 6. Flathub apps
 

@@ -4,6 +4,7 @@
 {{- $workName := promptStringOnce . "work_name" "Work git name (only used if work email is set)" "" -}}
 {{- $workFolder := promptStringOnce . "work_folder" "Work folder (repos here use the work identity)" "~/axon" -}}
 {{- $installDocker := promptBoolOnce . "install_docker" "Install docker-ce (in addition to podman)" true -}}
+{{- $accentColor := promptStringOnce . "accent_color" "Accent color for zsh prompt + tmux status (cyan, green, yellow, blue, magenta, red, white, or a 256-color index like 208)" "cyan" -}}
 
 [data]
     default_email = {{ $defaultEmail | quote }}
@@ -12,3 +13,4 @@
     work_name = {{ $workName | quote }}
     work_folder = {{ $workFolder | quote }}
     install_docker = {{ $installDocker }}
+    accent_color = {{ $accentColor | quote }}

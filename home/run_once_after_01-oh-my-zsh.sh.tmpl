@@ -20,6 +20,11 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
         "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
 fi
 
+if [ ! -d "$HOME/.zsh/pure" ]; then
+    git clone --depth=1 https://github.com/sindresorhus/pure \
+        "$HOME/.zsh/pure"
+fi
+
 ZSH_BIN="$(command -v zsh)"
 if [ -n "$ZSH_BIN" ] && [ "${SHELL:-}" != "$ZSH_BIN" ]; then
     echo "==> Changing login shell to $ZSH_BIN"

@@ -2,9 +2,16 @@
 # Managed by chezmoi. Edit ~/.local/share/chezmoi/home/dot_zshrc.tmpl
 ##############################################################################
 
-# oh-my-zsh
+# ---------- PATH ----------
+# Fedora's /etc/zshrc doesn't add ~/.local/bin the way /etc/bashrc does.
+# typeset -U auto-dedupes the array, so re-sourcing this file is safe.
+typeset -U path PATH
+path=("$HOME/.local/bin" "$HOME/bin" $path)
+
+# ---------- oh-my-zsh ----------
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="robbyrussell"
+# Empty theme — Pure is activated after oh-my-zsh below.
+ZSH_THEME=""
 DISABLE_AUTO_TITLE="true"
 plugins=(
     git
@@ -15,6 +22,21 @@ plugins=(
     zsh-syntax-highlighting
 )
 [ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
+
+# ---------- Pure prompt ----------
+# https://github.com/sindresorhus/pure — must load after oh-my-zsh.
+fpath+=("$HOME/.zsh/pure")
+autoload -U promptinit && promptinit
+prompt pure
+
+# Per-machine accent color (driven by chezmoi's accent_color prompt).
+# Accepts named colors (cyan, magenta) or 256-color indices (e.g. 208).
+zstyle :prompt:pure:path             color '{{ .accent_color }}'
+zstyle :prompt:pure:prompt:success   color '{{ .accent_color }}'
+zstyle :prompt:pure:prompt:error     color red
+zstyle :prompt:pure:git:branch       color 242
+zstyle :prompt:pure:git:dirty        color yellow
+zstyle :prompt:pure:execution_time   color yellow
 
 # ---------- aliases ----------
 alias ls='ls --color=auto'
@@ -74,18 +96,6 @@ function extract() {
 
 function pyclean() {
     find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
-}
-
-# spectrum_ls / spectrum_bls: show 256 colors
-function spectrum_ls() {
-    for code in {000..255}; do
-        print -P -- "$code: %F{$code}Arma virumque cano Troiae qui primus ab oris%f"
-    done
-}
-function spectrum_bls() {
-    for code in {000..255}; do
-        print -P -- "$code: %K{$code}Arma virumque cano Troiae qui primus ab oris%k"
-    done
 }
 
 # ---------- history ----------

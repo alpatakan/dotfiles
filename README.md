@@ -16,6 +16,7 @@ On first run, chezmoi prompts for:
 - `work_email` / `work_name` — git identity for repos under the work folder (leave empty to skip)
 - `work_folder` — where work repos live (default `~/axon`); `includeIf` in `.gitconfig` picks the work identity automatically when inside it
 - `install_docker` — install docker-ce alongside podman
+- `accent_color` — per-machine accent (cyan/green/yellow/blue/magenta/red/white or a 256-color index); drives the zsh prompt color + tmux active-window / pane-border color so you don't confuse boxes
 
 It then runs the `run_once_before_*` scripts (enable repos, install packages, configure sshd + GNOME), writes all dotfiles to `$HOME`, and runs the `run_once_after_*` scripts (oh-my-zsh, fnm + Node LTS, vim-plug, ed25519 SSH key).
 
@@ -26,14 +27,14 @@ When it finishes, follow the steps in [MANUAL.md](./MANUAL.md) (upload the SSH k
 | Category | Packages / tools |
 |---|---|
 | Toolchain | `development-tools`, `c-development` (dnf groups) |
-| Shell | `zsh`, `oh-my-zsh`, `zsh-autosuggestions`, `zsh-syntax-highlighting` |
+| Shell | `zsh`, `oh-my-zsh`, `pure` (sindresorhus/pure), `zsh-autosuggestions`, `zsh-syntax-highlighting` |
 | Editor | `vim` with vim-plug → fugitive, gruvbox, tagbar, fzf.vim, ALE, vim-javascript (plus `neovim` available for future use) |
 | Terminal | `ghostty` (via `scottames/ghostty` COPR) |
 | CLI | `tmux`, `fzf`, `ripgrep`, `btop`, `htop`, `fd-find`, `bat`, `zoxide`, `gh`, `jq`, `diff-so-fancy`, `tree`, `ShellCheck` |
 | Node | `fnm` + Node LTS |
 | Containers | Optional: `docker-ce` + compose plugin (podman is always present on Fedora) |
 | Remote access | `gnome-remote-desktop` (RDP with mandatory TLS) |
-| System | sshd on port 2211, firewalld + SELinux updated, GNOME no-sleep, GDM auto-login |
+| System | sshd (default port 22, key + password auth, no root), firewalld ssh service enabled, GNOME no-sleep, GDM auto-login |
 
 ## Repo layout
 
@@ -46,9 +47,9 @@ dotfiles/
 └── home/                  # chezmoi source tree (everything below here is managed)
     ├── .chezmoi.toml.tmpl         # First-run prompts
     ├── .chezmoiignore
-    ├── dot_tmux.conf              → ~/.tmux.conf
+    ├── dot_tmux.conf.tmpl         → ~/.tmux.conf (accent color + C-a leader)
     ├── dot_vimrc                  → ~/.vimrc
-    ├── dot_zshrc.tmpl             → ~/.zshrc
+    ├── dot_zshrc.tmpl             → ~/.zshrc (loads Pure + machine accent)
     ├── dot_gitconfig.tmpl         → ~/.gitconfig (default identity + includeIf for work)
     ├── dot_gitconfig-work.tmpl    → ~/.gitconfig-work (only if work_email set)
     ├── dot_config/ghostty/config  → ~/.config/ghostty/config
