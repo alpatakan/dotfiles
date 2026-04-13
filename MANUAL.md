@@ -24,21 +24,19 @@ git remote set-url origin git@github.com:alpatakan/dotfiles.git
 exit
 ```
 
-## 2. Create `~/.gitconfig-work` (not tracked in the repo)
+## 2. Work git identity (automated — only manual if you skipped it)
 
-`~/.gitconfig` includes `~/.gitconfig-work` when the repo path is under `~/ws/`. The file is intentionally **not** committed (contains work identity). Create it locally:
+If you provided `work_email` at init, chezmoi already generated `~/.gitconfig-work` and `~/.gitconfig` already has an `includeIf` for your work folder (`~/axon` by default). Nothing to do.
+
+If you skipped (left `work_email` empty at init) and want to add it later:
 
 ```bash
-cat > ~/.gitconfig-work <<'EOF'
-[user]
-    email = firstname.lastname@your-employer.example
-    name  = Your Name
-[core]
-    sshCommand = ssh -i ~/.ssh/id_ed25519_work
-EOF
+chezmoi state delete-bucket --bucket=entryState   # lets init re-prompt
+chezmoi init                                       # re-run prompts
+chezmoi apply -v
 ```
 
-Put work repos under `~/ws/`, personal repos under `~/my/`. Anything else uses the fallback identity in `~/.gitconfig`.
+The default git identity applies everywhere **except** repos under your configured work folder — those use the work identity automatically via `includeIf`.
 
 ## 3. Reboot
 

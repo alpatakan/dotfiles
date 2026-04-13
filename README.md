@@ -12,9 +12,10 @@ chezmoi init --apply alpatakan
 ```
 
 On first run, chezmoi prompts for:
-- `machine_type` (`work` or `personal`) — selects which git identity to use
+- `default_email` / `default_name` — git identity used for everything except work repos
+- `work_email` / `work_name` — git identity for repos under the work folder (leave empty to skip)
+- `work_folder` — where work repos live (default `~/axon`); `includeIf` in `.gitconfig` picks the work identity automatically when inside it
 - `install_docker` — install docker-ce alongside podman
-- `git_email` / `git_name` — used for the personal identity (`~/my/`)
 
 It then runs the `run_once_before_*` scripts (enable repos, install packages, configure sshd + GNOME), writes all dotfiles to `$HOME`, and runs the `run_once_after_*` scripts (oh-my-zsh, fnm + Node LTS, vim-plug, ed25519 SSH key).
 
@@ -48,8 +49,8 @@ dotfiles/
     ├── dot_tmux.conf              → ~/.tmux.conf
     ├── dot_vimrc                  → ~/.vimrc
     ├── dot_zshrc.tmpl             → ~/.zshrc
-    ├── dot_gitconfig.tmpl         → ~/.gitconfig
-    ├── dot_gitconfig-personal.tmpl → ~/.gitconfig-personal
+    ├── dot_gitconfig.tmpl         → ~/.gitconfig (default identity + includeIf for work)
+    ├── dot_gitconfig-work.tmpl    → ~/.gitconfig-work (only if work_email set)
     ├── dot_config/ghostty/config  → ~/.config/ghostty/config
     ├── private_dot_ssh/config.tmpl → ~/.ssh/config (0600)
     ├── run_once_before_01-enable-repos.sh.tmpl

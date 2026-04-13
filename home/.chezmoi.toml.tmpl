@@ -1,10 +1,14 @@
-{{- $machineType := promptStringOnce . "machine_type" "Machine type (work / personal)" "work" -}}
+{{- $defaultEmail := promptStringOnce . "default_email" "Default git email (used for everything except work repos)" "alpatakanisbakan@gmail.com" -}}
+{{- $defaultName := promptStringOnce . "default_name" "Default git name" "Alp Atakan Isbakan" -}}
+{{- $workEmail := promptStringOnce . "work_email" "Work git email (leave empty to skip work identity)" "" -}}
+{{- $workName := promptStringOnce . "work_name" "Work git name (only used if work email is set)" "" -}}
+{{- $workFolder := promptStringOnce . "work_folder" "Work folder (repos here use the work identity)" "~/axon" -}}
 {{- $installDocker := promptBoolOnce . "install_docker" "Install docker-ce (in addition to podman)" true -}}
-{{- $gitEmail := promptStringOnce . "git_email" "Git email (used for the personal identity)" "atakanisbakan@gmail.com" -}}
-{{- $gitName := promptStringOnce . "git_name" "Git name" "alpatakan" -}}
 
 [data]
-    machine_type = {{ $machineType | quote }}
+    default_email = {{ $defaultEmail | quote }}
+    default_name = {{ $defaultName | quote }}
+    work_email = {{ $workEmail | quote }}
+    work_name = {{ $workName | quote }}
+    work_folder = {{ $workFolder | quote }}
     install_docker = {{ $installDocker }}
-    git_email = {{ $gitEmail | quote }}
-    git_name = {{ $gitName | quote }}

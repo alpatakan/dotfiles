@@ -1,6 +1,6 @@
 [user]
-    email = {{ .git_email }}
-    name = {{ .git_name }}
+    email = {{ .default_email }}
+    name = {{ .default_name }}
 [alias]
     co = checkout
     br = branch
@@ -32,10 +32,12 @@
 [init]
     defaultBranch = main
 [pull]
-    rebase = false
+    rebase = true
+[rebase]
+    autoStash = true
 [push]
     autoSetupRemote = true
-[includeIf "gitdir:~/ws/"]
+{{- if .work_email }}
+[includeIf "gitdir:{{ .work_folder }}/"]
     path = ~/.gitconfig-work
-[includeIf "gitdir:~/my/"]
-    path = ~/.gitconfig-personal
+{{- end }}

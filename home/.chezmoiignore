@@ -1,2 +1,5 @@
 README.md
 LICENSE
+{{- if not .work_email }}
+.gitconfig-work
+{{- end }}
