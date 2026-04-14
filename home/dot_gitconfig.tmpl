@@ -6,8 +6,10 @@
     br = branch
     ci = commit
     st = status
+    p = pull
+    f = fetch
+    l = log --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -15
     lg = log --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-    lf = log --follow -p --
     root = rev-parse --show-toplevel
 [core]
     pager = "diff-so-fancy"

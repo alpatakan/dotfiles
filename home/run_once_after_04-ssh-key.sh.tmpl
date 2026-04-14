@@ -4,7 +4,9 @@ set -euo pipefail
 KEY="$HOME/.ssh/id_ed25519"
 PUB="$KEY.pub"
 
-if [ ! -f "$KEY" ]; then
+if [ -f "$KEY" ]; then
+    echo "==> SSH ed25519 key already exists at $KEY — skipping generation"
+else
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     echo "==> Generating ed25519 SSH key"

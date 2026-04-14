@@ -7,6 +7,13 @@ if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
         "$HOME/.tmux/plugins/tpm"
 fi
 
-# Install any declared plugins that aren't yet cloned. Non-fatal if tmux isn't
-# running — inside tmux you can also install them with prefix + I.
+# install_plugins queries `tmux show-environment -g TMUX_PLUGIN_MANAGER_PATH`.
+# If we land on a pre-existing tmux server (one started before TPM existed),
+# that variable will be missing. Force it now so the call below works
+# regardless of which tmux server it lands on.
+tmux start-server 2>/dev/null || true
+tmux set-environment -g TMUX_PLUGIN_MANAGER_PATH "$HOME/.tmux/plugins/" 2>/dev/null || true
+
+# Install any declared plugins that aren't yet cloned. Inside tmux you can
+# also install them with prefix + I.
 "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true

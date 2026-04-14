@@ -80,6 +80,10 @@ set-window-option -g monitor-activity off
 set-option -g bell-action none
 
 # ---------- plugins (TPM) ----------
+# Declare TMUX_PLUGIN_MANAGER_PATH up-front so it's set even on first run
+# before tpm has been cloned, and so install_plugins can find it headlessly.
+set-environment -g TMUX_PLUGIN_MANAGER_PATH "~/.tmux/plugins/"
+
 # clipboard (tmux-yank handles wl-copy / xclip / xsel / OSC 52 automatically)
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-yank'
