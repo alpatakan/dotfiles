@@ -24,6 +24,11 @@ if ! sudo dnf copr list 2>/dev/null | grep -q "scottames/ghostty"; then
     sudo dnf copr enable -y scottames/ghostty
 fi
 
+# Lazygit COPR (atim/lazygit — not in Fedora main repos)
+if ! sudo dnf copr list 2>/dev/null | grep -q "atim/lazygit"; then
+    sudo dnf copr enable -y atim/lazygit
+fi
+
 {{ if .install_docker -}}
 # Docker CE (official, not fedora's podman-docker shim)
 if [ ! -f /etc/yum.repos.d/docker-ce.repo ]; then

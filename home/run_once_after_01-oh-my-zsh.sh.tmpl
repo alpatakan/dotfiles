@@ -26,7 +26,8 @@ if [ ! -d "$HOME/.zsh/pure" ]; then
 fi
 
 ZSH_BIN="$(command -v zsh)"
-if [ -n "$ZSH_BIN" ] && [ "${SHELL:-}" != "$ZSH_BIN" ]; then
+CURRENT_SHELL="$(getent passwd "$USER" | cut -d: -f7)"
+if [ -n "$ZSH_BIN" ] && [ "$CURRENT_SHELL" != "$ZSH_BIN" ]; then
     echo "==> Changing login shell to $ZSH_BIN"
     sudo chsh -s "$ZSH_BIN" "$USER"
 fi

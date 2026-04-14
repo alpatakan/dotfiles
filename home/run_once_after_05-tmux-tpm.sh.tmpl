@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "==> Installing TPM (Tmux Plugin Manager) if missing"
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    git clone --depth=1 https://github.com/tmux-plugins/tpm \
+        "$HOME/.tmux/plugins/tpm"
+fi
+
+# Install any declared plugins that aren't yet cloned. Non-fatal if tmux isn't
+# running — inside tmux you can also install them with prefix + I.
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" || true

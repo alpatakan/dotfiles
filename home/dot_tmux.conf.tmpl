@@ -29,11 +29,6 @@ setw -g mode-keys vi
 bind-key -T copy-mode-vi 'v' send -X begin-selection
 bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
 
-# copy to system clipboard (Wayland via wl-copy, falls back to xclip on X11)
-if-shell 'command -v wl-copy >/dev/null' \
-    "bind -T copy-mode-vi 'y' send-keys -X copy-pipe-and-cancel 'wl-copy'" \
-    "bind -T copy-mode-vi 'y' send-keys -X copy-pipe-and-cancel 'xclip -in -selection clipboard'"
-
 # history
 set-option -g history-limit 100000
 
@@ -53,10 +48,10 @@ set -g status-justify left
 set -g status-interval 2
 set -g status-position bottom
 set -g status-style bg=colour234,fg=colour137,dim
-set -g status-left ''
-set -g status-left-length 20
-set -g status-right '#[fg=colour233,bg=colour241,bold] %d/%m #[fg=colour233,bg=colour245,bold] %H:%M:%S '
-set -g status-right-length 50
+set -g status-left '#[fg={{ $accent }},bold] #S #[fg=colour241]│ '
+set -g status-left-length 40
+set -g status-right '#{?client_prefix,#[bg=colour166#,fg=colour232#,bold] PREFIX ,}#[fg=colour245]#(test -n "$SSH_CONNECTION" && echo " SSH ")#[fg=colour248] #(whoami)@#H #[fg=colour233,bg=colour241,bold] %d/%m #[fg=colour233,bg=colour245,bold] %H:%M:%S '
+set -g status-right-length 120
 
 # messages
 set -g message-style fg=colour232,bg=colour166,bold
@@ -83,3 +78,11 @@ set-option -g visual-bell off
 set-option -g visual-silence off
 set-window-option -g monitor-activity off
 set-option -g bell-action none
+
+# ---------- plugins (TPM) ----------
+# clipboard (tmux-yank handles wl-copy / xclip / xsel / OSC 52 automatically)
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-yank'
+
+# keep this line last — initializes TPM
+run '~/.tmux/plugins/tpm/tpm'

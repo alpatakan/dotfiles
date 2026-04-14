@@ -37,6 +37,11 @@ zstyle :prompt:pure:prompt:error     color red
 zstyle :prompt:pure:git:branch       color 242
 zstyle :prompt:pure:git:dirty        color yellow
 zstyle :prompt:pure:execution_time   color yellow
+zstyle :prompt:pure:host             color '{{ .accent_color }}'
+zstyle :prompt:pure:user             color 242
+
+# Skip background git fetch — slow over SSH, noisy on remote boxes
+export PURE_GIT_PULL=0
 
 # ---------- aliases ----------
 alias ls='ls --color=auto'

@@ -30,7 +30,7 @@ When it finishes, follow the steps in [MANUAL.md](./MANUAL.md) (upload the SSH k
 | Shell | `zsh`, `oh-my-zsh`, `pure` (sindresorhus/pure), `zsh-autosuggestions`, `zsh-syntax-highlighting` |
 | Editor | `vim` with vim-plug → fugitive, gruvbox, tagbar, fzf.vim, ALE, vim-javascript (plus `neovim` available for future use) |
 | Terminal | `ghostty` (via `scottames/ghostty` COPR) |
-| CLI | `tmux`, `fzf`, `ripgrep`, `btop`, `htop`, `fd-find`, `bat`, `zoxide`, `gh`, `jq`, `diff-so-fancy`, `tree`, `ShellCheck` |
+| CLI | `tmux`, `fzf`, `ripgrep`, `btop`, `htop`, `fd-find`, `bat`, `zoxide`, `gh`, `jq`, `diff-so-fancy`, `tree`, `ShellCheck`, `lazygit` |
 | Node | `fnm` + Node LTS |
 | Containers | Optional: `docker-ce` + compose plugin (podman is always present on Fedora) |
 | Remote access | `gnome-remote-desktop` (RDP with mandatory TLS) |
