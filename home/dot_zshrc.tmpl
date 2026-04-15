@@ -40,6 +40,16 @@ zstyle :prompt:pure:execution_time   color yellow
 zstyle :prompt:pure:host             color '{{ .accent_color }}'
 zstyle :prompt:pure:user             color 242
 
+# Per-session accent override: inside tmux session "sf", swap Pure's accent
+# to teal-green (#089d7c) so the prompt matches the sf status bar. Needs
+# zsh 5.7+ for %F{#RRGGBB} and a true-color terminal (tmux passes RGB
+# through via terminal-features ',*:RGB').
+if [[ -n "$TMUX" ]] && [[ "$(command tmux display-message -p '#S' 2>/dev/null)" == "sf" ]]; then
+    zstyle :prompt:pure:path             color '#089d7c'
+    zstyle :prompt:pure:prompt:success   color '#089d7c'
+    zstyle :prompt:pure:host             color '#089d7c'
+fi
+
 # Skip background git fetch — slow over SSH, noisy on remote boxes
 export PURE_GIT_PULL=0
 
