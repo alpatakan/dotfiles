@@ -29,8 +29,8 @@ setw -g mode-keys vi
 bind-key -T copy-mode-vi 'v' send -X begin-selection
 bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
 
-# history
-set-option -g history-limit 100000
+# history (bumped for Claude Code scrollback streaming)
+set-option -g history-limit 250000
 
 # default shell
 set-option -g default-shell /bin/zsh
@@ -38,6 +38,26 @@ set-option -g default-shell /bin/zsh
 # true color + modern terminal
 set -g default-terminal "tmux-256color"
 set -ga terminal-overrides ",xterm-256color:Tc,ghostty:Tc"
+
+# ---- Claude Code / modern TUI support ----
+# Shift+Enter and kitty-keyboard extended keys
+set -s escape-time 0
+set -s extended-keys on
+set -as terminal-features 'xterm*:extkeys'
+
+# Let OSC 9/777 notifications and terminal progress sequences reach the outer terminal
+set -g allow-passthrough on
+
+# Forward focus-in/out events to the TUI (Claude Code Ink UI relies on these)
+set -g focus-events on
+
+# OSC 52 clipboard (cross-SSH copy works in Claude Code output)
+set -g set-clipboard on
+
+# Modern TUI features for any terminal emulator
+set -as terminal-features ',*:RGB'
+set -as terminal-features ',*:hyperlinks'
+set -as terminal-features ',*:usstyle'
 
 ######################
 ### DESIGN CHANGES ###
@@ -79,6 +99,24 @@ set-option -g visual-silence off
 set-window-option -g monitor-activity off
 set-option -g bell-action none
 
+# ---- per-session accent override: "sf" uses teal-green (#089d7c) ----
+# Fires on session-created; the conditional checks the hook's session name
+# for an exact match, so -t sf is safe (only runs when the new session IS sf).
+# NOTE: set-option's -t doesn't accept the "=name" exact-match prefix —
+# it errors with "no such window" — so use the bare name inside the block.
+set-hook -g session-created {
+    if -F "#{==:#{hook_session_name},sf}" {
+        set -t sf status-left "#[fg=#089d7c,bold] #S #[fg=colour241]│ "
+        set -t sf window-status-current-style "bg=colour238,fg=#089d7c,bold"
+        set -t sf window-status-current-format " #I#[fg=colour250]:#[fg=colour255]#W#[fg=#089d7c]#F "
+        set -t sf pane-active-border-style "fg=#089d7c"
+    }
+}
+
+# ---- Windows Terminal bracketed-paste unwedge (microsoft/terminal#19418) ----
+# prefix + U  →  injects ESC[201~ to clear a stuck bracketed-paste state
+bind U run-shell "tmux send-keys -l $'\\e[201~'" \; display "sent paste-end"
+
 # ---------- plugins (TPM) ----------
 # Declare TMUX_PLUGIN_MANAGER_PATH up-front so it's set even on first run
 # before tpm has been cloned, and so install_plugins can find it headlessly.
@@ -87,6 +125,9 @@ set-environment -g TMUX_PLUGIN_MANAGER_PATH "~/.tmux/plugins/"
 # clipboard (tmux-yank handles wl-copy / xclip / xsel / OSC 52 automatically)
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-yank'
+
+# Move TPM's update-plugins binding off prefix+U (we use U for WT unwedge).
+set -g @tpm-update 'M-u'
 
 # keep this line last — initializes TPM
 run '~/.tmux/plugins/tpm/tpm'

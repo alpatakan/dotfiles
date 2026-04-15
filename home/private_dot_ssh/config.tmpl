@@ -8,3 +8,10 @@ Host github.com
 # Add machine-specific hosts in ~/.ssh/config.d/ (loaded below via Include)
 # Keeps private hostnames out of the public dotfiles repo.
 Include ~/.ssh/config.d/*
+
+# Defaults for all hosts (keep at the bottom — ssh uses first-match per option,
+# so machine-specific blocks above still win on overlapping options).
+Host *
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+    TCPKeepAlive yes
