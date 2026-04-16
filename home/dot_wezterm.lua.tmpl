@@ -1,0 +1,220 @@
+local wezterm = require 'wezterm'
+local act     = wezterm.action
+
+local config  = wezterm.config_builder()
+
+
+-- ─── General ─────────────────────────────────────────────────────────────────
+config.automatically_reload_config              = true
+config.audible_bell                             = 'Disabled'
+config.scrollback_lines                         = 100000
+config.adjust_window_size_when_changing_font_size = false
+config.window_close_confirmation                = 'NeverPrompt'
+
+-- ─── Default program ─────────────────────────────────────────────────────────
+{{ if eq .chezmoi.os "windows" -}}
+config.default_prog = { 'ssh.exe', 'river' }
+{{- end }}
+
+-- ─── Font — JetBrains Mono (crisp on IPS/VA LED panels) ──────────────────────
+-- Download free at: https://www.jetbrains.com/lp/mono/
+config.font = wezterm.font_with_fallback({
+  { family = 'JetBrains Mono', weight = 'DemiBold' },
+  'Segoe UI Emoji',
+  'Noto Color Emoji',
+})
+-- Explicit bold face — prevents synthesized/blurry bold, uses real ExtraBold glyph
+config.font_rules = {
+  {
+    intensity = 'Bold',
+    font = wezterm.font_with_fallback({
+      { family = 'JetBrains Mono', weight = 'ExtraBold' },
+      'Segoe UI Emoji',
+      'Noto Color Emoji',
+    }),
+  },
+  {
+    intensity = 'Bold',
+    italic    = true,
+    font = wezterm.font_with_fallback({
+      { family = 'JetBrains Mono', weight = 'ExtraBold', italic = true },
+      'Segoe UI Emoji',
+      'Noto Color Emoji',
+    }),
+  },
+}
+config.font_size                              = 11.5
+config.line_height                            = 0.95
+config.use_cap_height_to_scale_fallback_fonts = true
+
+-- Subpixel (ClearType-like) rendering — sharper on horizontal LCD/LED stripe panels
+config.freetype_load_target   = 'Light'
+config.freetype_render_target = 'HorizontalLcd'
+
+-- Bold text uses bright ANSI color variants
+config.bold_brightens_ansi_colors = true
+
+-- Slightly boost foreground brightness for improved contrast on VA panels
+config.foreground_text_hsb = { hue = 1.0, saturation = 1.0, brightness = 1.15 }
+
+-- Use WezTerm's own box/block glyph renderer — sharper tmux borders & powerline
+config.custom_block_glyphs    = true
+config.anti_alias_custom_block_glyphs = false  -- keep tmux lines pixel-sharp
+
+-- ─── Cursor ──────────────────────────────────────────────────────────────────
+config.default_cursor_style = 'BlinkingBar'
+config.cursor_blink_rate    = 500
+config.animation_fps        = 60
+
+-- ─── Colors ──────────────────────────────────────────────────────────────────
+config.color_scheme = 'Dark+'
+config.color_schemes = {
+  ['Dark+'] = {
+    foreground = '#cacaca',
+    background = '#0b0b0b',
+    cursor_bg = '#bcbda4',
+    cursor_border = '#bcbda4',
+    cursor_fg = '#bcbda4',
+    selection_bg = '#bcbda4',
+    selection_fg = '#1d1b21',
+  }
+}
+
+config.window_background_opacity = 1.0   -- keep solid for readability
+config.text_background_opacity = 1.0
+
+-- ─── Tab bar ─────────────────────────────────────────────────────────────────
+config.use_fancy_tab_bar              = false
+-- config.hide_tab_bar_if_only_one_tab   = true
+-- config.show_new_tab_button_in_tab_bar = false
+config.tab_max_width                  = 64
+
+-- ─── Window ──────────────────────────────────────────────────────────────────
+config.window_padding    = { left = 8, right = 8, top = 6, bottom = 4 }
+config.enable_scroll_bar = false
+
+-- ─── Key bindings ─────────────────────────────────────────────────────────────
+-- ALT-based bindings avoid conflicts with tmux (CTRL+B prefix forwarded as-is)
+config.keys = {
+  -- Launcher
+  { key = 'l',     mods = 'ALT',       action = act.ShowLauncher },
+
+  -- Tabs
+  { key = 't',          mods = 'ALT',       action = act.SpawnTab 'CurrentPaneDomain' },
+  { key = 'w',          mods = 'ALT',       action = act.CloseCurrentTab { confirm = false } },
+  { key = 'LeftArrow',  mods = 'ALT',       action = act.ActivateTabRelative(-1) },
+  { key = 'RightArrow', mods = 'ALT',       action = act.ActivateTabRelative(1) },
+  { key = 'LeftArrow',  mods = 'ALT|SHIFT', action = act.MoveTabRelative(-1) },
+  { key = 'RightArrow', mods = 'ALT|SHIFT', action = act.MoveTabRelative(1) },
+
+  -- Panes (WezTerm-native, useful when NOT inside tmux)
+  { key = '-',  mods = 'ALT', action = act.SplitVertical   { domain = 'CurrentPaneDomain' } },
+  { key = '\\', mods = 'ALT', action = act.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'h',  mods = 'ALT', action = act.ActivatePaneDirection 'Left' },
+  { key = 'j',  mods = 'ALT', action = act.ActivatePaneDirection 'Down' },
+  { key = 'k',  mods = 'ALT', action = act.ActivatePaneDirection 'Up' },
+  { key = 'i',  mods = 'ALT', action = act.ActivatePaneDirection 'Right' },
+
+  -- Font size
+  { key = '=',     mods = 'CTRL',       action = act.IncreaseFontSize },
+  { key = '-',     mods = 'CTRL',       action = act.DecreaseFontSize },
+  { key = '0',     mods = 'CTRL',       action = act.ResetFontSize },
+
+  -- Clipboard
+  { key = 'c', mods = 'CTRL|SHIFT', action = act.CopyTo 'Clipboard' },
+  { key = 'v', mods = 'CTRL|SHIFT', action = act.PasteFrom 'Clipboard' },
+
+  -- Scrollback
+  { key = 'u', mods = 'CTRL|SHIFT', action = act.ScrollByPage(-0.5) },
+  { key = 'd', mods = 'CTRL|SHIFT', action = act.ScrollByPage(0.5) },
+
+  -- Search
+  { key = 'f', mods = 'CTRL|SHIFT', action = act.Search { CaseSensitiveString = '' } },
+
+  -- Reload config
+  { key = 'r', mods = 'CTRL|SHIFT', action = act.ReloadConfiguration },
+
+  -- Full screen
+  { key = 'Enter', mods = 'ALT', action = act.ToggleFullScreen },
+}
+
+-- ─── Mouse ───────────────────────────────────────────────────────────────────
+config.mouse_bindings = {
+  -- Right-click pastes (mirrors most Linux terminal behaviour)
+  {
+    event  = { Down = { streak = 1, button = 'Right' } },
+    mods   = 'NONE',
+    action = act.PasteFrom 'Clipboard',
+  },
+}
+
+-- =============================================================================
+-- WEZTERM QUICK REFERENCE
+-- =============================================================================
+--
+-- KEY BINDINGS
+-- ─────────────────────────────────────────────────────────────────────────────
+-- ALT+L                Open launcher (SSH targets, new tab types, …)
+-- ALT+Enter            Toggle full-screen
+--
+-- Tabs
+--   ALT+T              New tab (uses default_prog / SSH to river)
+--   ALT+W              Close current tab (no prompt)
+--   ALT+←/→            Switch to previous / next tab
+--   ALT+SHIFT+←/→      Reorder current tab left / right
+--
+-- Panes  (WezTerm-native — prefer tmux splits when inside tmux)
+--   ALT+-              Split current pane top/bottom
+--   ALT+\              Split current pane left/right
+--   ALT+H/J/K/I        Focus pane: Left / Down / Up / Right
+--
+-- Font size
+--   CTRL+=             Increase font size
+--   CTRL+-             Decrease font size
+--   CTRL+0             Reset font size to config default
+--
+-- Clipboard
+--   CTRL+SHIFT+C       Copy selection to clipboard
+--   CTRL+SHIFT+V       Paste from clipboard
+--   Right-click        Paste from clipboard
+--
+-- Scrollback
+--   CTRL+SHIFT+U       Scroll up half page
+--   CTRL+SHIFT+D       Scroll down half page
+--   Mouse wheel        Scroll line by line
+--
+-- Search
+--   CTRL+SHIFT+F       Open in-pane search bar  (Enter = next, Esc = close)
+--
+-- Config
+--   CTRL+SHIFT+R       Reload .wezterm.lua immediately
+--
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TMUX INTEGRATION NOTES
+-- ─────────────────────────────────────────────────────────────────────────────
+-- WezTerm forwards CTRL+B (and every other CTRL combo) to the PTY unchanged,
+-- so tmux prefix and all tmux bindings work exactly as configured.
+-- Use ALT-based bindings (above) for WezTerm-level window management only.
+--
+-- Common tmux bindings to pair with this config:
+--   CTRL+B %           Split pane left / right
+--   CTRL+B "           Split pane top / bottom
+--   CTRL+B Arrow       Navigate panes
+--   CTRL+B c           New window
+--   CTRL+B n / p       Next / previous window
+--   CTRL+B ,           Rename current window
+--   CTRL+B d           Detach from session
+--   CTRL+B [           Enter scroll/copy mode  (q to exit, Space to select)
+--   CTRL+B ]           Paste tmux copy buffer
+--
+-- ─────────────────────────────────────────────────────────────────────────────
+-- FONT
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Primary: JetBrains Mono Medium 11.5pt
+-- Download: https://www.jetbrains.com/lp/mono/
+-- Fallback alternatives (change family above):
+--   'Monaspace Neon'   — GitHub's 2024 variable font superfamily
+--   'Geist Mono'       — Vercel's ultra-clean 2024 monospace
+--   'Cascadia Code'    — Microsoft's font with ligatures
+
+return config
