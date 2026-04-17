@@ -9,11 +9,11 @@ config.automatically_reload_config              = true
 config.audible_bell                             = 'Disabled'
 config.scrollback_lines                         = 100000
 config.adjust_window_size_when_changing_font_size = false
-config.window_close_confirmation                = 'NeverPrompt'
+-- config.window_close_confirmation                = 'NeverPrompt'
 
 -- ─── Default program ─────────────────────────────────────────────────────────
 {{ if eq .chezmoi.os "windows" -}}
-config.default_prog = { 'ssh.exe', 'river' }
+config.default_domain = 'SSH:river'
 {{- end }}
 
 -- ─── Font — JetBrains Mono (crisp on IPS/VA LED panels) ──────────────────────
@@ -44,7 +44,7 @@ config.font_rules = {
   },
 }
 config.font_size                              = 11.5
-config.line_height                            = 0.95
+config.line_height                            = 0.98
 config.use_cap_height_to_scale_fallback_fonts = true
 
 -- Subpixel (ClearType-like) rendering — sharper on horizontal LCD/LED stripe panels
@@ -55,7 +55,7 @@ config.freetype_render_target = 'HorizontalLcd'
 config.bold_brightens_ansi_colors = true
 
 -- Slightly boost foreground brightness for improved contrast on VA panels
-config.foreground_text_hsb = { hue = 1.0, saturation = 1.0, brightness = 1.15 }
+config.foreground_text_hsb = { hue = 1.0, saturation = 1.0, brightness = 1.05 }
 
 -- Use WezTerm's own box/block glyph renderer — sharper tmux borders & powerline
 config.custom_block_glyphs    = true
